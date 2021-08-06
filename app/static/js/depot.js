@@ -243,7 +243,7 @@ function checkNumber() {
 	} else if (/^\D+$/.test(Number(obj))) {
 		error.innerHTML = "<font color='red'>只能输入数字</font>";
 		return false;
-	} else if (/^\d+.\d+$/.test(Number(obj))) {
+	} else if (/^\d+[\.]\d+$/.test(Number(obj))) {
 		error.innerHTML = "<font color='red'>只能输入整数</font>";
 		return false;	
 	} else {
