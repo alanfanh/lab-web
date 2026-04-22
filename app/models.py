@@ -1,5 +1,5 @@
 #-*-coding:utf-8-*-
-from flask_login import LoginManager,login_user,logout_user,UserMixin,login_required,AnonymousUserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from . import db,login_manager
 from werkzeug.security import generate_password_hash,check_password_hash
 from datetime import datetime
@@ -48,10 +48,9 @@ class User(UserMixin,db.Model):
     password_hash= db.Column(db.String(256),nullable=False)
     email = db.Column(db.String(64),nullable=True,index=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    def __init__(self,name,username):
-        # super(User,self).__init__(**kwargs)
-        self.name = name
-        self.username =username
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        
         if self.role is None:
             if self.username == "admin":
                 self.role = Role.query.filter_by(permissions=0xff).first()
