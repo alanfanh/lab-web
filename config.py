@@ -36,11 +36,17 @@ class ProductionConfig(Config):
 
 
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost:3306/test'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:12345678@localhost:3306/test'
     DEBUG = True
+
+class TestingConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    TESTING = True
+    WTF_CSRF_ENABLED = False
 
 config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
+    'testing': TestingConfig,
     'default': DevelopmentConfig
 }
