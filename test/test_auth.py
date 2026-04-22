@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-    :author: 张丽萍
-"""
 from flask import url_for
-
 from app.models import User
-from .config import Operations
+from ..config import Operations
 from app.utils import generate_token
-from tests.base import BaseTestCase
+from .base import BaseTestCase
 
 
 class AuthTestCase(BaseTestCase):
@@ -16,9 +12,10 @@ class AuthTestCase(BaseTestCase):
         response = self.login(name='admin', password='admin')
         data = response.get_data(as_text=True)
         self.assertIn('登录成功!', data)
+    
     #普通用户登录
     def test_login_normal_user(self):
-        response = self.login()
+        response = self.login(name='normal', password='12345')
         data = response.get_data(as_text=True)
         self.assertIn('登录成功!', data)
         
