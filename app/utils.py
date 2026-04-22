@@ -1,40 +1,42 @@
 # -*- coding: utf-8 -*-
 import re
 import os
+import jwt
 import uuid
 import xlrd, xlwt
 from xlrd import xldate_as_tuple
-from openpyxl import Workbook, load_workbook
-from datetime import datetime
-from werkzeug import secure_filename
-
+from openpyxl import load_workbook
+from datetime import datetime, timezone, timedelta
+from app.models import User
+from config import Operations
+from . import db
 try:
-    from urlparse import urlparse, urljoin
+    from urllib.parse import urlparse, urljoin
 except ImportError:
     from urllib.parse import urlparse, urljoin
 
 # import PIL
 # from PIL import Image
 from flask import current_app, request, url_for, redirect, flash
-from itsdangerous import BadSignature, SignatureExpired
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
-from config import Operations
-from . import db
+
 
 def generate_token(user, operation, expire_in=None, **kwargs):
-    s = Serializer(current_app.config['SECRET_KEY'], expire_in)
-    data = {'id': user.id, 'operation': operation}
-    data.update(**kwargs)
-    return s.dumps(data)
+    # JWT需要过期的时间点
+    payload = {
+        'id': user.id,
+        'operation': operation,
+        'exp': datetime.now(timezone.utc) + timedelta(seconds=expire_in or current_app.config['TOKEN_EXPIRATION'])
+    }
+    payload.update(**kwargs)
+    return jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
 
 
 def validate_token(user, token, operation, new_password=None):
-    s = Serializer(current_app.config['SECRET_KEY'])
-
     try:
-        data = s.loads(token)
-    except (SignatureExpired, BadSignature):
+        # 解密token，获取payload数据
+        data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
         return False
 
     if operation != data.get('operation') or user.id != data.get('id'):
@@ -46,9 +48,7 @@ def validate_token(user, token, operation, new_password=None):
         user.set_password(new_password)
     elif operation == Operations.CHANGE_EMAIL:
         new_email = data.get('new_email')
-        if new_email is None:
-            return False
-        if User.query.filter_by(email=new_email).first() is not None:
+        if new_email is None or User.query.filter_by(email=new_email).first() is not None:
             return False
         user.email = new_email
     else:
