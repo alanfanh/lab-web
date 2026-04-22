@@ -15,19 +15,42 @@
 ### 语言
 
 ```text
-python3.6 64bit
+python3.14 64bit
 ```
 
 ### 依赖
 
-> 可使用"pip install -r requirements.txt"一键安装所有依赖项。
+> 使用uv管理python包依赖
 
-> 具体依赖库请查看"requirements.txt"。
+同步项目包依赖，uv自动将包安装到项目根目录下的venv虚环境中
+```sh
+uv sync
+```
+添加新的包依赖
+```sh
+uv add flask-admin
+```
+运行项目
+```sh
+uv run python manage.py
+```
 
 ### 数据库
 
 > MySQL或者MariaDB等关系型数据库
 
+初始化迁移仓库(根目录没有migrations文件时执行)
+```sh
+uv run flask --app manage.py db init
+```
+对比models.py生成SQL迁移脚本
+```sh
+uv run flask --app manage.py db migrate -m "init database"
+```
+将变更应用到数据库
+```sh
+uv run flask --app manage.py db upgrade
+```
 ## 项目结构
 
 > 持续更新中.....
@@ -71,7 +94,8 @@ webapp
 │   ├── model.py                     # 数据模型
 │   ├── utils.py                     # 辅助函数
 │   └── emails.py                    #
-├── requirements.txt               # 项目依赖
+├── pyproject.toml                 # uv项目管理依赖
+├── uv.lock                        # uv项目管理依赖
 ├── Readme.md                      # 项目Guide
 ├── uwsgi_cnf.ini                  # uwsgi服务器的配置
 ├── config.py  		               # 配置文件
