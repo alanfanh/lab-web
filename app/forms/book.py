@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField,SubmitField,DateTimeField,IntegerField,FloatField,DateField
-from wtforms.validators import DataRequired, Optional, Length,NumberRange
-from flask_wtf.file import FileField,FileRequired,FileAllowed
+from wtforms import StringField, SelectField,SubmitField, IntegerField, FloatField, DateField
+from wtforms.validators import Optional, Length, NumberRange
 
 
 #图书馆
