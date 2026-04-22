@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template, flash, redirect, url_for, current_app, request, Blueprint,send_from_directory
-from flask_login import login_required, current_user, fresh_login_required, logout_user
+from flask_login import login_required
 from app.forms.book import BookForm
 from app.forms.main import UploadForm
 from app.models import Book, Record
 from .. import db
 from app.utils import redirect_back,rename_file,allowed_file,read_excel,write_excel,\
-checkHead,checkInt,checkNumber,checkType,checkEmpty,checkNumber,checkType,checkType2,checkDate,checkCompareDate,checkEmail,checkLength
+checkHead,checkNumber,checkType,checkEmpty,checkNumber,checkType,checkType2,checkDate,checkCompareDate,checkLength
 from app.decorators import admin_required
 from sqlalchemy import or_
 import os
 from datetime import datetime
-import re
 
 book_bp = Blueprint('book', __name__)
 
@@ -36,7 +35,7 @@ def index():
                                             ).paginate(page, per_page)
         books = pagination.items
     else:
-        pagination = Book.query.paginate(page, per_page)
+        pagination = Book.query.paginate(page=page, per_page=per_page, error_out=False)
     books = pagination.items
     form = UploadForm()
     return render_template('book/index.html', pagination=pagination, books=books,form=form)

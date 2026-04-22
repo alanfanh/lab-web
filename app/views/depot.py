@@ -18,7 +18,7 @@ depot_bp = Blueprint('depot', __name__)
 def index():
         page = request.args.get('page', 1, type=int)
         per_page = current_app.config['DEPOT_PER_PAGE']
-        pagination = Depot.query.paginate(page, per_page)
+        pagination = Depot.query.paginate(page=page, per_page=per_page, error_out=False)
         depots = pagination.items
         return render_template('depot/index.html', pagination=pagination, depots=depots)
 

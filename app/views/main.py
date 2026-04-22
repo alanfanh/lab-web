@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
-import re
 import os
-from flask import render_template, flash, redirect, url_for, current_app, send_from_directory, request, abort, Blueprint,send_from_directory
+from flask import render_template, flash, redirect, url_for, current_app, send_from_directory, request, Blueprint,send_from_directory
 from flask_login import login_required, current_user
-from sqlalchemy.sql.expression import func
 from .. import db
-from app.utils import redirect_back,rename_file,allowed_file,read_excel,write_excel,checkHead,checkInt,checkNumber,checkType,checkEmpty,checkNumber,checkType,checkType2,checkDate,checkCompareDate,checkEmail
+from app.utils import redirect_back,rename_file,allowed_file,read_excel,write_excel,checkHead,checkInt,checkType,checkEmpty,checkType,checkType2,checkDate,checkCompareDate,checkEmail
 from app.forms.main import ComproductForm,UploadForm,FixedassetsForm,ConsumablesForm
 from app.models import T1, T2, T3, Depot, Record
 from app.decorators import admin_required
 from datetime import datetime
-from sqlalchemy import or_,and_
+from sqlalchemy import or_, and_
 main_bp = Blueprint('main', __name__)
 
 
@@ -28,7 +26,7 @@ def index():
 def show(name):
     print(request.args)
     page = request.args.get('page', 1, type=int)
-    per_page = current_app.config['MAIN_PER_PAGE']
+    per_page = current_app.config.get('MAIN_PER_PAGE', 10)
     depots = Depot.query.all()
     depot = Depot.query.filter_by(name = name).first()
     template_id = depot.template_id
@@ -47,9 +45,11 @@ def show(name):
                                                             T1.entertime.like("%"+q+"%")
                                                             
                                                     )
-                                                ).paginate(page, per_page)
+                                                ).paginate(page=page, per_page=per_page, error_out=False)
         else:
-            pagination = T1.query.filter_by(name=name).paginate(page, per_page)
+            pagination = T1.query.filter_by(name=name).paginate(
+                page=page, per_page=per_page, error_out=False
+            )
         cmps = pagination.items  
     elif  template_id == 2:
         q = request.args.get('q','')
@@ -64,9 +64,9 @@ def show(name):
                                                         T2.position.like("%"+q+"%"),
                                                         T2.owner.like("%"+q+"%")
                                                 )
-                                                            ).paginate(page, per_page)
+                                                            ).paginate(page=page, per_page=per_page, error_out=False)
         else:
-            pagination = T2.query.filter_by(name=name).paginate(page, per_page)
+            pagination = T2.query.filter_by(name=name).paginate(page=page, per_page=per_page, error_out=False)
         cmps = pagination.items  
     elif template_id == 3:
         q = request.args.get('q','')
@@ -82,10 +82,10 @@ def show(name):
                                                             T3.department.like("%"+q+"%"),
                                                             T3.owner.like("%"+q+"%")
                                                     )
-                                                ).paginate(page, per_page)
+                                                ).paginate(page=page, per_page=per_page, error_out=False)
         else:
-            pagination = T3.query.filter_by(name=name).paginate(page, per_page)
-        cmps = pagination.items  
+            pagination = T3.query.filter_by(name=name).paginate(page=page, per_page=per_page, error_out=False)
+        cmps = pagination.items
     return render_template('main/show.html', pagination=pagination, cmps=cmps,form=form,depots=depots,depot=depot,template_id=template_id)
       
 

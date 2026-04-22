@@ -8,7 +8,6 @@ from .. import db
 from app.utils import redirect_back
 from app.decorators import admin_required,permission_required
 from sqlalchemy import or_
-
 user_bp = Blueprint('user', __name__)
 
 #普通用户列表
@@ -22,14 +21,13 @@ def index():
         per_page = current_app.config['USER_PER_PAGE']
         if q:
             pagination = User.query.filter(
-                                                    or_(
-                                                        User.username.like("%"+q+"%"),
-                                                        User.name.like("%"+q+"%")
-                                                    )
-           
-           ).paginate(page, per_page)
+                                        or_(
+                                            User.username.like("%"+q+"%"),
+                                            User.name.like("%"+q+"%")
+                                        )
+           ).paginate(page=page, per_page=per_page, error_out=False)
         else:
-            pagination = User.query.paginate(page, per_page)
+            pagination = User.query.paginate(page=page, per_page=per_page, error_out=False)
         users = pagination.items  
         for user in users:
             if user.username == "admin":

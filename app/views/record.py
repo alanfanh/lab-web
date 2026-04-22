@@ -24,7 +24,7 @@ def index():
             "%"+q+"%"), Record.product.like("%"+q+"%"), Record.depotname.like("%"+q+"%"))).paginate(page, per_page)
         records = pagination.items
     else:
-        pagination = Record.query.paginate(page, per_page)
+        pagination = Record.query.paginate(page=page, per_page=per_page, error_out=False)
     records = pagination.items
     return render_template('record/index.html', pagination=pagination, records=records)
 
